@@ -1,0 +1,50 @@
+The number is: 42
+Base address of child process: 0x5aa026c1a000
+Offset of 'main' function: 0x1149
+Calculated address of 'main' in child process: 0x5aa026c1b149
+word at main_address: 0xe5894855fa1e0ff3
+trap word:            0xe5894855fa1e0fcc
+Step 1, RIP: 0x5aa026c1b149
+0x5aa026c1b149:	endbr64	  ; test.c:3
+
+Step 2, RIP: 0x5aa026c1b14d
+0x5aa026c1b14d:	push	rbp  ; test.c:3
+
+Step 3, RIP: 0x5aa026c1b14e
+0x5aa026c1b14e:	mov	rbp, rsp  ; test.c:3
+
+Step 4, RIP: 0x5aa026c1b151
+0x5aa026c1b151:	sub	rsp, 0x10  ; test.c:3
+
+Step 5, RIP: 0x5aa026c1b155
+0x5aa026c1b155:	mov	dword ptr [rbp - 4], 0x2a  ; test.c:4
+
+Step 6, RIP: 0x5aa026c1b15c
+0x5aa026c1b15c:	mov	eax, dword ptr [rbp - 4]  ; test.c:5
+
+Step 7, RIP: 0x5aa026c1b15f
+0x5aa026c1b15f:	mov	esi, eax  ; test.c:5
+
+Step 8, RIP: 0x5aa026c1b161
+0x5aa026c1b161:	lea	rax, [rip + 0xe9c]  ; test.c:5
+
+Step 9, RIP: 0x5aa026c1b168
+0x5aa026c1b168:	mov	rdi, rax  ; test.c:5
+
+Step 10, RIP: 0x5aa026c1b16b
+0x5aa026c1b16b:	mov	eax, 0  ; test.c:5
+
+Step 11, RIP: 0x5aa026c1b170
+0x5aa026c1b170:	call	0x5aa026c1b050  ; test.c:5
+
+Step 12, RIP: 0x5aa026c1b175
+0x5aa026c1b175:	mov	eax, 0  ; test.c:6
+
+Step 13, RIP: 0x5aa026c1b17a
+0x5aa026c1b17a:	leave	  ; test.c:7
+
+Step 14, RIP: 0x5aa026c1b17b
+0x5aa026c1b17b:	ret	  ; test.c:7
+
+Returning from main.
+Child process has exited at address: 0x5aa026c1b17b
