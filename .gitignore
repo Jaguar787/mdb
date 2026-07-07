@@ -1,2 +1,6 @@
-# Ignore text files
-*.txt
+# Ignore files
+output.txt
+
+# Ignore binaries
+dbg
+test
