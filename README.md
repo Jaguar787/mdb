@@ -63,27 +63,27 @@ Note: removing a breakpoint is still in development
 ### Example Session
 
 ```
-./dbg ./test
 Welcome to micro debugger.
 The options are:
 1. b (breakpoint at a function name)
-2. c (continue execution)
-3. s (step through instructions)
-4. q (quit)
+2. r (remove a breakpoint)
+3. c (continue execution)
+4. s (step through instructions)
+5. q (quit)
 Enter command: b
 Enter function name: main
-Base address: 0x7f1234567000
-Setting breakpoint at main: offset 0x1234, runtime 0x7f1234568234
-Breakpoint set at address: 0x7f1234568234
-It worked.
+Base address: 0x5659f1886000
+Setting breakpoint at main: offset 0x1149, runtime 0x5659f1887149
+Breakpoint set at address: 0x5659f1887149
 Enter command: c
-Hit breakpoint at 0x7f1234568234!
+
+Hit breakpoint at 0x5659f1887149!
 Stopped at breakpoint. Ready to step or continue.
-Enter command: s
-Step 1, RIP: 0x7f1234568235
-0x7f1234568235:	push	rbp
-  ; test.c:3
-```
+Enter command: si
+Step 1, RIP: 0x5659f188714e
+0x5659f188714e: mov     rbp, rsp  ; test.c:3
+
+Enter command: 
 
 ## Project Structure
 
