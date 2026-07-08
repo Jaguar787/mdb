@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     printf("3. c (continue execution)\n");
     printf("4. s (step through instructions)\n");
     printf("5. q (quit)\n");
-    sleep(1);
 
     while (1)
     {
@@ -132,7 +131,7 @@ int main(int argc, char *argv[])
                 continue;
             }
             bp->is_active = 0; // False
-            printf("Breakpoint %s is removed at %lx", bpToRemove, bp->addr);
+            printf("Breakpoint, %s, is removed at %lx.\n", bpToRemove, bp->addr);
         }
         else if (input[0] == 'c')
         {
@@ -142,19 +141,28 @@ int main(int argc, char *argv[])
             if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP)
             {
                 ptrace(PTRACE_GETREGS, child_pid, NULL, &regs);
+                unsigned long bp_address = regs.rip - 1;
+                Breakpoint *bp = lookup_addr(bp_address);
 
                 /* Verify if we actually hit the expected breakpoint */
-                if (regs.rip == main_address + 1)
+                if (bp != NULL)
                 {
-
-                    printf("\nHit breakpoint at 0x%lx!\n", main_address);
-
                     /* 1. Rewind RIP back to the original instruction start address */
-                    regs.rip = main_address;
+                    regs.rip = bp->addr;
                     ptrace(PTRACE_SETREGS, child_pid, NULL, &regs);
 
                     /* 2. Restore the original opcode byte so it can execute safely */
-                    ptrace(PTRACE_POKETEXT, child_pid, (void *)main_address, (void *)saved_word);
+                    ptrace(PTRACE_POKETEXT, child_pid, (void *)bp->addr, (void *)bp->original_instruction);
+
+                    /* Return without resetting breakpoint*/
+                    if (!bp->is_active)
+                    {
+                        ptrace(PTRACE_CONT, child_pid, NULL, NULL);
+                        waitpid(child_pid, &status, 0);
+                        continue;
+                    }
+
+                    printf("Hit breakpoint at 0x%lx!\n", bp->addr);
 
                     /* 3. To make the breakpoint PERSISTENT: */
                     /* We single-step over the original instruction right now, then re-trap it. */
@@ -163,8 +171,8 @@ int main(int argc, char *argv[])
                         waitpid(child_pid, &status, 0);
 
                         /* Re-enact the INT3 trap so it catches next time the function runs */
-                        long trap = (saved_word & ~0xFF) | 0xCC;
-                        ptrace(PTRACE_POKETEXT, child_pid, (void *)main_address, (void *)trap);
+                        long trap = (bp->original_instruction & ~0xFF) | 0xCC;
+                        ptrace(PTRACE_POKETEXT, child_pid, (void *)bp->addr, (void *)trap);
 
                         /* Fetch current registers after the secret single-step */
                         ptrace(PTRACE_GETREGS, child_pid, NULL, &regs);
@@ -188,6 +196,7 @@ int main(int argc, char *argv[])
                 break;
             }
         }
+
         else if (input[0] == 's')
         {
             if (ptrace(PTRACE_SINGLESTEP, child_pid, NULL, NULL) < 0)
@@ -196,6 +205,17 @@ int main(int argc, char *argv[])
                 break;
             }
             waitpid(child_pid, &status, 0);
+
+            if (WIFEXITED(status))
+            {
+                printf("Target program exited cleanly with status %d.\n", WEXITSTATUS(status));
+                break;
+            }
+            else if (WIFSIGNALED(status))
+            {
+                printf("Target program terminated by signal %d.\n", WTERMSIG(status));
+                break;
+            }
 
             ptrace(PTRACE_GETREGS, child_pid, NULL, &regs);
             step_count++;
@@ -209,10 +229,11 @@ int main(int argc, char *argv[])
             memcpy(code + 8, &word2, sizeof(word2));
 
             int should_quit = 0;
+            Breakpoint *bp = lookup_addr(regs.rip);
 
-            if (regs.rip == main_address)
+            if (bp != NULL && bp->is_active)
             {
-                memcpy(code, &saved_word, sizeof(saved_word));
+                memcpy(code, &bp->original_instruction, sizeof(bp->original_instruction));
             }
 
             size_t count = cs_disasm(capstone_handle, (uint8_t *)code, sizeof(code), regs.rip, 0, &insn);

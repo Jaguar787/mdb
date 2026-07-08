@@ -2,6 +2,8 @@
 
 A lightweight C-based debugger for Linux that enables interactive debugging of programs through process tracing and DWARF symbol information.
 
+Note: This is for educational purposes, there are likely bugs in the implementation. 
+
 ## Features
 
 - **Breakpoint Management**: Set breakpoints at function names
@@ -72,18 +74,24 @@ The options are:
 5. q (quit)
 Enter command: b
 Enter function name: main
-Base address: 0x5659f1886000
-Setting breakpoint at main: offset 0x1149, runtime 0x5659f1887149
-Breakpoint set at address: 0x5659f1887149
+Base address: 0x6205b3ad3000
+Setting breakpoint at main: offset 0x1149, runtime 0x6205b3ad4149
+Breakpoint set at address: 0x6205b3ad4149
 Enter command: c
-
-Hit breakpoint at 0x5659f1887149!
+Hit breakpoint at 0x6205b3ad4149!
 Stopped at breakpoint. Ready to step or continue.
-Enter command: si
-Step 1, RIP: 0x5659f188714e
-0x5659f188714e: mov     rbp, rsp  ; test.c:3
+Enter command: s
+Step 1, RIP: 0x6205b3ad414e
+0x6205b3ad414e: mov     rbp, rsp  ; test.c:3
 
-Enter command: 
+Enter command: s
+Step 2, RIP: 0x6205b3ad4151
+0x6205b3ad4151: sub     rsp, 0x10  ; test.c:3
+
+Enter command: c
+The number is: 42
+Target program exited cleanly with status 0.
+```
 
 ## Project Structure
 
