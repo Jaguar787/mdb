@@ -28,7 +28,7 @@ void map_insert(unsigned long key, Breakpoint *bp)
  * @param addr The address of the breakpoint to look up.
  * @return Pointer to the Breakpoint structure's value if found, NULL otherwise.
  */
-Breakpoint *lookup(unsigned long addr)
+Breakpoint *lookup_addr(unsigned long addr)
 {
     for (int i = 0; i < my_map.size; i++)
     {
