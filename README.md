@@ -65,7 +65,6 @@ Note: removing a breakpoint is still in development
 ### Example Session
 
 ```
-./dbg ./test
 Welcome to micro debugger.
 The options are:
 1. b (breakpoint at a function name)
